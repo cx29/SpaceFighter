@@ -1,0 +1,3 @@
+/Users/twonine/repo/SpaceFighter/build/CMakeFiles/SpaceFighter-Darwin.dir
+/Users/twonine/repo/SpaceFighter/build/CMakeFiles/edit_cache.dir
+/Users/twonine/repo/SpaceFighter/build/CMakeFiles/rebuild_cache.dir
