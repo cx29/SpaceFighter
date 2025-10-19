@@ -39,7 +39,15 @@ endforeach ()
 
 
 # 添加可执行文件
-add_executable(${TARGET} main.cpp)
+add_executable(${TARGET} main.cpp
+        src/Application.cpp
+        src/Game.cpp
+        src/Game.h
+        src/Scene.cpp
+        src/Scene.h
+        src/SceneMain.cpp
+        src/SceneMain.h
+        src/Object.h)
 # 链接库
 #target_link_libraries(${TARGET}
 #        SDL2::SDL2
