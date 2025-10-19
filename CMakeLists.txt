@@ -23,6 +23,9 @@ set(TARGET ${PROJECT_NAME}-${CMAKE_SYSTEM_NAME})
 
 # 在 vcpkg 安装列表中查找 SDL2
 find_package(SDL2 CONFIG REQUIRED)
+find_package(SDL2_image CONFIG REQUIRED)
+find_package(SDL2_mixer CONFIG REQUIRED)
+find_package(SDL2_ttf CONFIG REQUIRED)
 # 添加可执行文件
 add_executable(${TARGET} main.cpp)
 # 链接库
@@ -33,4 +36,9 @@ add_executable(${TARGET} main.cpp)
 # 更新链接库，使用变量来链接 SDL2库，确保在任何平台在都能正确链接所必要的 SDL2库
 target_link_libraries(${TARGET}
         ${SDL2_LIBRARIES}
+        $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,
+        SDL2_image::SDL2_image,
+        SDL2_image::SDL2_image-static>
+        $<IF:$<TARGET_EXISTS:SDL2_mixer::SDL2_mixer>,SDL2_mixer::SDL2_mixer,SDL2_mixer::SDL2_mixer-static>
+        $<IF:$<TARGET_EXISTS:SDL2_ttf::SDL2_ttf>,SDL2_ttf::SDL2_ttf,SDL2_ttf::SDL2_ttf-static>
 )
