@@ -12,6 +12,8 @@ struct Player {
     SDL_FPoint position = {0, 0};
     int width = 0;
     int height = 0;
+    //每秒移动 200px
+    int speed = 200;
 };
 
 #endif //SPACEFIGHTER_OBJECT_H

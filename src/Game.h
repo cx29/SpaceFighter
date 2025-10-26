@@ -35,7 +35,7 @@ public:
 
     void handleEvent(SDL_Event *event);
 
-    void update();
+    void update(float deltaTime);
 
     void render();
 
@@ -59,6 +59,12 @@ private:
     SDL_Renderer *renderer = nullptr;
     int windowWidth = 600;
     int windowHeight = 800;
+    //目标帧率
+    int FPS = 90;
+    //每帧的目标时间(ms)
+    Uint32 frameTime;
+    //两帧之间的时间差(s)
+    float deltaTime;
 };
 
 #endif //SPACEFIGHTER_GAME_H

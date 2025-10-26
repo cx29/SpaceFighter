@@ -14,10 +14,25 @@ Game::~Game() {
 
 void Game::run() {
     while (isRunning) {
+        //记录帧开始的时间
+        auto frameStart = SDL_GetTicks();
         SDL_Event event;
         handleEvent(&event);
-        update();
+        update(deltaTime);
         render();
+        //记录帧结束的时间
+        auto frameEnd = SDL_GetTicks();
+        // 计算帧处理的时间
+        auto diff = frameEnd - frameStart;
+        if (diff < frameTime) {
+            //如果处理太快则延迟一下
+            SDL_Delay(frameTime - diff);
+            // 转换为秒
+            deltaTime = frameTime / 1000.0f;
+        } else {
+            //如果处理较慢则使用实际时间
+            deltaTime = diff / 1000.0f;
+        }
     }
 }
 
@@ -30,8 +45,8 @@ void Game::handleEvent(SDL_Event *event) {
     currentScene->handleEvent(event);
 }
 
-void Game::update() {
-    currentScene->update();
+void Game::update(float deltaTime) {
+    currentScene->update(deltaTime);
 }
 
 void Game::render() {
@@ -41,6 +56,8 @@ void Game::render() {
 }
 
 void Game::init() {
+    frameTime = 1000 / FPS;
+
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "SDL could not initialize! SDL error: %s", SDL_GetError());
         isRunning = false;
@@ -62,7 +79,7 @@ void Game::init() {
     }
 
     //初始化 SDL_Image
-    if (IMG_Init(IMG_INIT_PNG)!=IMG_INIT_PNG) {
+    if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "IMG_Init: %s", SDL_GetError());
         isRunning = false;
         return;

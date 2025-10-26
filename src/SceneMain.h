@@ -18,13 +18,16 @@ public:
 
     void init() override;
 
-    void update() override;
+    void update(float deltaTime) override;
 
     void render() override;
 
     void clean() override;
 
     void handleEvent(SDL_Event *event) override;
+
+    // 轮询方式查询键盘事件
+    void keyboardControl(float deltaTime);
 
 private:
     Game &game;
