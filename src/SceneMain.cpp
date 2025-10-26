@@ -22,13 +22,20 @@ void SceneMain::init() {
     player.height /= 4;
     player.position.x = game.getWindowWidth() / 2 - player.width / 2;
     player.position.y = game.getWindowHeight() - player.height;
+
+    projectilePlayerTemplate.texture = IMG_LoadTexture(game.getRenderer(), "assets/image/laser-1.png");
+    SDL_QueryTexture(projectilePlayerTemplate.texture,NULL,NULL, &projectilePlayerTemplate.width, &projectilePlayerTemplate.height);
+    projectilePlayerTemplate.width /= 4;
+    projectilePlayerTemplate.height /= 4;
 }
 
 void SceneMain::update(float deltaTime) {
     keyboardControl(deltaTime);
+    updatePlayerProjectiles(deltaTime);
 }
 
 void SceneMain::render() {
+    renderPlayerProjectiles();
     SDL_Rect playerRect = {
         static_cast<int>(player.position.x),
         static_cast<int>(player.position.y),
@@ -39,8 +46,23 @@ void SceneMain::render() {
 }
 
 void SceneMain::clean() {
+    //清理子弹
+    for (auto &projectile: projectilesPlayer) {
+        if (projectile != nullptr) {
+            delete projectile;
+        }
+    }
+
+    projectilesPlayer.clear();
+
     if (player.texture != nullptr) {
         SDL_DestroyTexture(player.texture);
+    }
+    // 清除子弹纹理
+    if (projectilePlayerTemplate.texture != nullptr) {
+    }
+    {
+        SDL_DestroyTexture(projectilePlayerTemplate.texture);
     }
 }
 
@@ -74,5 +96,50 @@ void SceneMain::keyboardControl(float deltaTime) {
     }
     if (player.position.y > game.getWindowHeight() - player.height) {
         player.position.y = game.getWindowHeight() - player.height;
+    }
+
+    //射击逻辑
+    if (keyboardState[SDL_SCANCODE_SPACE]) {
+        auto currentTime = SDL_GetTicks();
+        if (currentTime - player.lastShootTime > player.coolDown) {
+            shootPlayer();
+            player.lastShootTime = currentTime;
+        }
+    }
+}
+
+void SceneMain::shootPlayer() {
+    // 创建新子弹
+    auto projectile = new ProjectilePlayer(projectilePlayerTemplate);
+    projectile->position.x = player.position.x + player.width / 2 - projectile->width / 2;
+    projectile->position.y = player.position.y;
+    //添加到活动的子弹列表
+    projectilesPlayer.push_back(projectile);
+}
+
+void SceneMain::updatePlayerProjectiles(float deltaTime) {
+    //设定为子弹超出屏幕外边距的距离
+    int margin = 32;
+    for (auto it = projectilesPlayer.begin(); it != projectilesPlayer.end();) {
+        auto projectile = *it;
+        projectile->position.y -= projectile->speed * deltaTime;
+        if (projectile->position.y + margin < 0) {
+            delete projectile;
+            it = projectilesPlayer.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void SceneMain::renderPlayerProjectiles() {
+    for (auto projectile: projectilesPlayer) {
+        SDL_Rect projectileRect = {
+            static_cast<int>(projectile->position.x),
+            static_cast<int>(projectile->position.y),
+            projectile->width,
+            projectile->height
+        };
+        SDL_RenderCopy(game.getRenderer(), projectile->texture,NULL, &projectileRect);
     }
 }
